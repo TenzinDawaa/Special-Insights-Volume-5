@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Path of Insight: An Interactive Infographic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            overscroll-behavior: none;
+        }
+        h1, h2, h3, h4, #modal-title {
+            font-family: 'Lora', serif;
+        }
+        .topic-item { transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out; }
+        .topic-item:hover { background-color: #eef2ff; } /* Indigo-50 */
+        .topic-item.selected { background-color: #e0e7ff; color: #3730a3; } /* Indigo-200, Indigo-800 */
+
+        .sub-topic-card {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform: translateY(0);
+        }
+        .sub-topic-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1);
+        }
+
+        .content-card {
+            transition: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+        .prose ul { list-style-type: none; padding-left: 0; }
+        .prose li { position: relative; padding-left: 1.75rem; margin-bottom: 0.75rem; }
+        .prose li::before {
+            content: '✧';
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: #4f46e5; /* Indigo-600 */
+            font-weight: bold;
+        }
+        .loader {
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top: 4px solid #fff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .modal-trigger {
+            color: #4338ca; /* Indigo-700 */
+            font-weight: 600;
+            cursor: pointer;
+            border-bottom: 2px solid #a5b4fc; /* Indigo-300 */
+            transition: all 0.2s;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        .modal-trigger:hover { background-color: #e0e7ff; }
+        #modal-overlay { transition: opacity 0.3s ease-in-out; }
+        #modal-content { transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-screen-2xl">
+        <header class="text-center mb-12">
+            <div class="inline-block p-4 bg-white/50 rounded-full shadow-lg mb-4">
+                <svg class="w-24 h-24 text-indigo-500" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 95C74.8528 95 95 74.8528 95 50C95 25.1472 74.8528 5 50 5C25.1472 5 5 25.1472 5 50C5 74.8528 25.1472 95 50 95Z" stroke="url(#paint0_linear_113_2)" stroke-width="3" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M50 78V22" stroke="url(#paint1_linear_113_2)" stroke-width="3" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M29.4 65.6L70.6 34.4" stroke="url(#paint2_linear_113_2)" stroke-width="3" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M29.4 34.4L70.6 65.6" stroke="url(#paint3_linear_113_2)" stroke-width="3" stroke-miterlimit="10" stroke-linecap="round" stroke-linejoin="round"/>
+                    <defs>
+                        <linearGradient id="paint0_linear_113_2" x1="50" y1="5" x2="50" y2="95" gradientUnits="userSpaceOnUse"><stop stop-color="#818cf8"/><stop offset="1" stop-color="#4f46e5"/></linearGradient>
+                        <linearGradient id="paint1_linear_113_2" x1="50.5" y1="22" x2="50.5" y2="78" gradientUnits="userSpaceOnUse"><stop stop-color="#a78bfa"/><stop offset="1" stop-color="#6d28d9"/></linearGradient>
+                        <linearGradient id="paint2_linear_113_2" x1="50" y1="34.4" x2="50" y2="65.6" gradientUnits="userSpaceOnUse"><stop stop-color="#a78bfa"/><stop offset="1" stop-color="#6d28d9"/></linearGradient>
+                        <linearGradient id="paint3_linear_113_2" x1="50" y1="34.4" x2="50" y2="65.6" gradientUnits="userSpaceOnUse"><stop stop-color="#a78bfa"/><stop offset="1" stop-color="#6d28d9"/></linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-bold text-slate-900 bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-teal-500">The Path of Insight</h1>
+            <p class="text-slate-600 mt-4 text-lg max-w-3xl mx-auto">An intensive, interactive study guide on Tsongkhapa's Lamrim Chenmo, Volume 5, exploring the profound view of emptiness.</p>
+        </header>
+
+        <section id="video-section" class="my-12 fade-in">
+            <h2 class="text-3xl md:text-4xl font-bold text-center text-slate-800 mb-8">Introductory Videos</h2>
+            <div class="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 px-4">
+                <div class="aspect-video rounded-xl shadow-2xl overflow-hidden border-4 border-white/80 bg-black">
+                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/m3N9Cys77Cc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+                <div class="aspect-video rounded-xl shadow-2xl overflow-hidden border-4 border-white/80 bg-black">
+                    <iframe class="w-full h-full" src="https://www.youtube.com/embed/9DMmoDH0drg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                </div>
+            </div>
+        </section>
+
+        <div class="flex flex-col lg:flex-row gap-8">
+            <aside class="lg:w-1/3 xl:w-1/4 bg-white/60 p-6 rounded-2xl shadow-lg border border-slate-200 h-fit content-card">
+                <h2 class="text-2xl font-bold mb-4 text-slate-800">Study Topics</h2>
+                <div id="topics-tree" class="text-sm md:text-base"></div>
+            </aside>
+
+            <main class="lg:w-2/3 xl:w-3/4">
+                <div id="content-display" class="bg-white/60 p-6 md:p-8 rounded-2xl shadow-lg border border-slate-200 min-h-[70vh] content-card">
+                    <div id="welcome-message" class="text-center text-slate-500 flex flex-col items-center justify-center h-full">
+                         <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 mb-4"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></svg>
+                        <h3 class="text-3xl font-bold text-slate-700">Welcome to the Path</h3>
+                        <p class="mt-2 text-lg">Select a topic from the navigation tree to begin your study.</p>
+                    </div>
+                    <div id="topic-content-wrapper" class="hidden">
+                        <div class="flex items-center gap-6 mb-6">
+                            <div id="topic-image" class="flex-shrink-0 p-2 bg-indigo-100 rounded-full"></div>
+                            <h2 id="topic-title" class="text-3xl md:text-4xl font-bold text-slate-900"></h2>
+                        </div>
+                        <div id="topic-controls" class="flex items-center gap-4 mb-6 border-b border-slate-300 pb-4">
+                            <button id="read-aloud-btn" class="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-4 rounded-lg transition-all shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                <span id="read-aloud-text">Read Aloud</span>
+                            </button>
+                        </div>
+                        <div id="topic-content" class="prose prose-slate max-w-none text-slate-700 leading-relaxed"></div>
+                    </div>
+                </div>
+
+                <div id="qa-section" class="mt-8 bg-white/60 p-6 md:p-8 rounded-2xl shadow-lg border border-slate-200 content-card hidden">
+                    <h3 class="text-2xl font-bold text-slate-900 mb-4">Ask a Question</h3>
+                    <p class="text-slate-600 mb-4">Ask about the current topic, and an AI assistant will provide an answer based on the text.</p>
+                    <div class="flex flex-col md:flex-row gap-2">
+                        <input type="text" id="qa-input" placeholder="e.g., Explain the chariot analogy in detail." class="flex-grow p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none transition">
+                        <button id="qa-submit" class="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-6 rounded-lg transition-all shadow-md hover:shadow-lg flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500">
+                            <span id="qa-submit-text">Ask</span>
+                            <div id="qa-loader" class="loader hidden"></div>
+                        </button>
+                    </div>
+                    <div id="qa-answer-wrapper" class="mt-6 hidden">
+                        <h4 class="font-bold text-slate-800 text-lg">Answer:</h4>
+                        <p id="qa-answer" class="mt-2 text-slate-700 bg-slate-100 p-4 rounded-lg border border-slate-200"></p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="modal-overlay" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center p-4 z-50">
+        <div id="modal-content" class="bg-white rounded-2xl shadow-2xl p-8 max-w-2xl w-full transform scale-95">
+            <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-4">
+                    <div id="modal-icon" class="flex-shrink-0"></div>
+                    <h3 id="modal-title" class="text-2xl font-bold text-slate-900"></h3>
+                </div>
+                <button id="modal-close" class="text-slate-500 hover:text-slate-800">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="modal-body" class="prose prose-slate max-w-none text-slate-700 leading-relaxed max-h-[60vh] overflow-y-auto pr-4"></div>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA STRUCTURE & ICONS ---
+        const svgs = {
+            // Main Sections
+            foundation: `<svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>`,
+            intellect: `<svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>`,
+            meditation: `<svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1.5a10.5 10.5 0 1 0 0 21 10.5 10.5 0 0 0 0-21zm0 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15z"></path><path d="M12 5.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z"></path></svg>`,
+            union: `<svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path><path d="M2 8c0-2.2.7-4.3 2-6"></path><path d="M22 8c0-2.2-.7-4.3-2-6"></path></svg>`,
+            // Sub-topics & Modals
+            antidote: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`,
+            synergy: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12z"></path></svg>`,
+            guide: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`,
+            reliance: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 18H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3.19M15 6h2a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-3.19"></path><line x1="12" y1="22" x2="12" y2="2"></line></svg>`,
+            teachings: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>`,
+            nagarjuna: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="4"></circle><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"></line><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"></line><line x1="9.17" y1="14.83" x2="4.93" y2="19.07"></line><line x1="19.07" y1="4.93" x2="14.83" y2="9.17"></line></svg>`,
+            goal: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="6"></circle><circle cx="12" cy="12" r="2"></circle></svg>`,
+            root: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V8a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v13"></path><path d="M9 12h6"></path><path d="M12 9v6"></path></svg>`,
+            conviction: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12M12 12L16 8M12 12L8 8"></path><path d="M12 2L14 4M12 2L10 4"></path></svg>`,
+            negation: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>`,
+            pitfalls: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>`,
+            prasangika: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-8-4.5-8-11.8A8 8 0 0 1 12 2a8 8 0 0 1 8 8.2c0 7.3-8 11.8-8 11.8z"></path><circle cx="12" cy="10" r="3"></circle></svg>`,
+            sevenfold: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 18.5l-3-3-3 3"></path><path d="M11.5 15.5l-10-10"></path><path d="M18.5 14.5l-3-3-3 3"></path><path d="M21.5 11.5l-10-10"></path></svg>`,
+            illusion: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12c-2.5 4-8 4-8 4s-5.5 0-8-4c2.5-4 8-4 8-4s5.5 0 8 4z"></path><path d="M8 12c0-2.209 1.791-4 4-4s4 1.791 4 4-1.791 4-4 4-4-1.791-4-4z"></path></svg>`,
+            phenomena: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`,
+            insightNature: `<svg class="w-8 h-8 text-teal-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M18 9l-6 6-6-6"></path></svg>`,
+            sixPerfections: `<svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.32 0L12 2.69z"></path><path d="M8.5 8.5l7 7"></path><path d="M12 2.69v18.62"></path><path d="M15.5 8.5l-7 7"></path></svg>`,
+            fourReliancesModal: `<svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="3" y1="15" x2="21" y2="15"></line><line x1="9" y1="3" x2="9" y2="21"></line><line x1="15" y1="3" x2="15" y2="21"></line></svg>`,
+            twoExtremes: `<svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12H3M21 6H3M21 18H3"></path><path d="M12 21V3"></path></svg>`,
+            dependentArising: `<svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line></svg>`,
+            sevenfoldModal: `<svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V4a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2z"></path><circle cx="8.5" cy="15.5" r="2.5"></circle><circle cx="15.5" cy="15.5" r="2.5"></circle><path d="M18 5H6v5h12V5z"></path></svg>`,
+            fourExtremesModal: `<svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20M5.6 18.4L18.4 5.6M5.6 5.6l12.8 12.8"></path></svg>`,
+            threeTrainings: `<svg class="w-12 h-12 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`
+        };
+
+        const infographicData = [
+            {
+                title: "Part I: The Foundation for Insight",
+                image: svgs.foundation,
+                content: "This part establishes the fundamental rationale for the entire path of insight. It identifies the root problem as a cognitive error—a misunderstanding of reality—and the solution as a cognitive correction achieved through cultivating wisdom. Every stage of the path, including study, analysis, and debate, is a central and transformative spiritual practice.",
+                children: [
+                    {
+                        title: "Section 1: The Imperative of Insight",
+                        image: svgs.antidote,
+                        content: "Details the foundational reasons for cultivating insight (vipaśyanā), presenting it as the essence of the path to liberation from suffering. It is not an optional or advanced practice, but the core of the journey.",
+                        children: [
+                            { title: "Insight as the Sole Antidote", image: svgs.antidote, content: "<ul><li>The ultimate cause of all suffering and the cycle of rebirth (samsara) is identified not as external conditions but as a fundamental internal ignorance, or <b>avidyā</b>. This is not a simple absence of knowledge but a deep-seated, active misunderstanding of reality—specifically, the grasping at phenomena as possessing inherent or objective existence.</li><li>Special insight, defined as the 'supreme wisdom understanding emptiness (śūnyatā),' is the only 'weapon' capable of severing this root cause of suffering.</li><li>By destroying this root of ignorance, all eighty-four thousand derivative afflictions (attachment, hatred, pride, etc.) are consequently destroyed.</li></ul>" },
+                            { title: "Synergistic Relationship with Śamatha", image: svgs.synergy, content: "<ul><li>Meditative concentration (śamatha) is a necessary prerequisite for effective insight. It provides a stable, clear, and pliable mental platform upon which the rigorous analysis of vipaśyanā can be conducted without being derailed by mental agitation or dullness.</li><li>However, śamatha alone is a worldly attainment. It can only suppress mental afflictions, not eradicate their underlying seeds.</li><li>The ultimate goal is the inseparable union of śamatha and vipaśyanā. The text uses the analogy of a <b>tiny fish swimming gently in a vast, still bowl of clear water</b>: the mind's stability (śamatha) remains undisturbed while a subtle analytical faculty (vipaśyanā) investigates reality.</li></ul>" },
+                            { title: "Wisdom as the Guide", image: svgs.guide, content: "<ul><li>The first five of the <span class='modal-trigger' data-modal-id='sixPerfections'>six perfections</span>—generosity, ethical conduct, patience, joyous effort, and meditative concentration—are essential components of the Mahayana path.</li><li>However, without the guiding wisdom of insight, these other practices are 'blind' and cannot, on their own, lead to full enlightenment.</li><li>Wisdom is like the <b>eyes of a careful driver</b> who steers a powerful vehicle (the other five perfections) to its correct destination. Without this guidance, even the most dedicated practice lacks the capacity to dismantle the fundamental ignorance that perpetuates samsara.</li></ul>" }
+                        ]
+                    },
+                    // ... other sections with more detail and icons ...
+                ]
+            },
+             {
+                title: "Part II: The Intellectual Path",
+                image: svgs.intellect,
+                content: "This part delves into the core intellectual work of the path: learning to precisely identify what is being negated (inherent existence) and navigating the subtle philosophical errors that arise from an imprecise understanding. This stage is characterized by a high degree of analytical precision, wielding the 'scalpel' of reasoning to isolate and refute a very specific cognitive error.",
+                children: [
+                    {
+                        title: "Section 4: Identifying the Object of Negation",
+                        image: svgs.negation,
+                        content: "Provides a detailed analysis of 'inherent existence' as the subtle object to be refuted. Precision in this identification is presented as the most critical element of the intellectual path, as any error here will lead one into one of the two philosophical extremes.",
+                        children: [
+                            { title: "Objects Negated by the Path vs. Reasoning", image: svgs.negation, content: "A critical distinction is introduced:<ul><li><b>Objects Negated by the Path:</b> These are mental obstructions that actually exist within a practitioner's mindstream and are progressively eliminated through spiritual practice (e.g., ignorance, attachment, and their seeds).</li><li><b>Objects Negated by Reasoning:</b> This refers to the object that is held by the mind of ignorance but which, in fact, does not exist at all. The primary object negated by reasoning is inherent existence. The goal of logical analysis is to prove the complete nonexistence of this object.</li></ul>" },
+                            { title: "The Implicit Qualifier", image: svgs.teachings, content: "A key principle for correctly interpreting Madhyamaka texts is understanding the implicit qualifier. When a text states 'form does not exist,' it often implicitly means 'form does not inherently exist.' Understanding this is essential to avoid falling into the extreme of nihilism, ensuring that analysis only refutes the supposed inherent nature, not conventional existence." }
+                        ]
+                    },
+                    {
+                        title: "Section 5: Navigating Philosophical Pitfalls",
+                        image: svgs.pitfalls,
+                        content: "The path of intellectual learning is fraught with the <span class='modal-trigger' data-modal-id='twoExtremes'>two extremes</span> of nihilism and eternalism. These are not presented as merely unrelated wrong views, but as two opposite failures of the single, critical skill of differentiating conventional existence from inherent existence. Both errors stem from the same root assumption: that for something to exist, it must possess some form of inherent, findable reality.",
+                        children: [
+                            { title: "The Extreme of Nihilism (Negating Too Much)", image: svgs.pitfalls, content: "This error arises from identifying the object of negation too broadly. The nihilist practitioner, upon discovering that phenomena are not findable under ultimate analysis, mistakenly concludes that they do not exist at all. This leads to the repudiation of all conventional reality, including causality, karma, and the spiritual path itself." },
+                            { title: "The Extreme of Eternalism (Negating Too Little)", image: svgs.pitfalls, content: "This error arises from identifying the object of negation too narrowly. This occurs when a practitioner refutes a coarse, fabricated concept of the self (e.g., a permanent, partless soul) but fails to refute the much more subtle, innate grasping at the conventionally existent self as being inherently real. This mistake leaves the true root of samsara completely intact." }
+                        ]
+                    },
+                    {
+                        title: "Section 6: The Prāsaṅgika View",
+                        image: svgs.prasangika,
+                        content: "This section synthesizes Tsongkhapa's arguments for the supremacy of the Prāsaṅgika-Madhyamaka school, which he presents as the only system that perfectly navigates the treacherous path between the two extremes.",
+                        children: [
+                            { title: "The Unique Prāsaṅgika Thesis", image: svgs.prasangika, content: "The core philosophical distinction lies in their understanding of conventional reality.<ul><li><b>Svātantrikas</b> assert that while phenomena are not ultimately existent, they are <i>conventionally inherently existent</i>.</li><li><b>Prāsaṅgikas</b>, in contrast, negate inherent existence completely, <i>even conventionally</i>. They argue that conventional phenomena are merely imputed by name and thought, lacking any inherent nature from their own side.</li></ul>" },
+                            { title: "Reconciling Emptiness and Dependent Arising", image: svgs.synergy, content: "The 'king of reasons' for establishing emptiness is the principle of <span class='modal-trigger' data-modal-id='dependentArising'>dependent arising</span>. The Prāsaṅgika view uniquely holds that these two principles are two facets of the same reality. Because things are dependently arisen, they are necessarily empty of inherent existence. And because they are empty, they are able to function as dependently arisen phenomena. This perfect reconciliation is the unique strength of the Prāsaṅgika system." }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: "Part III: The Meditative Path",
+                image: svgs.meditation,
+                content: "This part transitions from the intellectual learning process to the practical application of that understanding in formal meditation. It details specific techniques for deconstructing naive realism and describes the experiential outcomes of successful practice.",
+                children: [
+                    {
+                        title: "Section 7: The Sevenfold Analysis",
+                        image: svgs.sevenfold,
+                        content: "This is a classic analytical meditation technique used to realize the selflessness of persons. It employs the analogy of a chariot to make the abstract analysis concrete and accessible. This method is a systematic meditative protocol designed to deconstruct our innate 'naive realism'—the unquestioned belief that the names we use correspond to findable, essential 'things.' Explore the <span class='modal-trigger' data-modal-id='sevenfoldModal'>Sevenfold Analysis</span> in detail.",
+                        children: [
+                             { title: "The Seven Points", image: svgs.sevenfold, content: "A yogi undertakes an exhaustive search for the inherent existence of the self in relation to its basis of imputation, the psycho-physical aggregates (body and mind). This is done through seven lines of inquiry:<ul><li>1. Is the self inherently the same as the aggregates?</li><li>2. Is the self inherently different from the aggregates?</li><li>3. Is the self inherently the support of the aggregates?</li><li>4. Are the aggregates inherently the support of the self?</li><li>5. Does the self inherently possess the aggregates?</li><li>6. Is the self the mere collection of the aggregates?</li><li>7. Is the self the shape of the aggregates?</li></ul>" },
+                             { title: "Result of the Analysis", image: svgs.conviction, content: "Through this systematic and exhaustive search, the yogi fails to find an inherently existent self in any of these seven ways. This comprehensive non-finding is not a discovery of nothingness but the direct, experiential realization that the self lacks inherent existence. The conclusion is that the self exists, but only as a conventional imputation upon the aggregates, in precisely the same way that a 'chariot' exists as an imputation upon its collection of parts. The 'thingness' we attribute to the self is revealed to be a mental construct." }
+                        ]
+                    },
+                    {
+                        title: "Section 8: Illusion-like Appearance",
+                        image: svgs.illusion,
+                        content: "This section describes the profound shift in perception that occurs in the post-meditation period, which is the experiential fruit of realizing emptiness. The goal of meditation is not to make the world disappear, but to see it correctly.",
+                        children: [
+                            { title: "Appearance and Emptiness Simultaneously", image: svgs.illusion, content: "Having realized in meditation that phenomena do not exist as they appear (i.e., inherently), the yogi arises from that session and perceives the world as 'illusion-like.' This is a sophisticated, non-contradictory perception holding two truths simultaneously: phenomena appear to be real, solid, and functional, yet they are understood at the same time to be completely empty of the inherent nature they appear to possess. The practitioner is no longer fooled by appearances." }
+                        ]
+                    },
+                    {
+                        title: "Section 9: Selflessness of Phenomena",
+                        image: svgs.phenomena,
+                        content: "This section details how the analytical method is extended from the self to all other phenomena, establishing the universal nature of emptiness and revealing the profound interconnectedness of all reality.",
+                        children: [
+                            { title: "The Four Extremes of Production", image: svgs.pitfalls, content: "The primary method for establishing the selflessness of phenomena is the refutation of the <span class='modal-trigger' data-modal-id='fourExtremesModal'>four extremes of production</span>, or the four possible ways that things could be produced inherently:<ul><li>1. From self (meaningless, endless production).</li><li>2. From other (absurd consequences, anything could arise from anything).</li><li>3. From both (incurs the faults of both).</li><li>4. Without a cause (things would arise everywhere or not at all).</li></ul>This logical refutation leads back to the ultimate proof of emptiness: things are empty because they are dependently arisen." }
+                        ]
+                    }
+                ]
+            },
+            {
+                title: "Part IV: The Union of Method and Wisdom",
+                image: svgs.union,
+                content: "This final part addresses the advanced stages of meditative practice, focusing on the correct way to cultivate insight and the methodology for achieving the seamless integration of stabilizing and analytical meditation. This union is a dynamic, self-perpetuating feedback loop that creates an upward spiral of realization.",
+                children: [
+                    {
+                        title: "Section 11: The Nature of Insight Meditation",
+                        image: svgs.insightNature,
+                        content: "This section refutes non-analytical or 'no-thought' approaches to meditation on emptiness, establishing it as an active, investigative, and cognitive process. The text posits that the mind's unanalyzed state is one of profound ignorance, and therefore a powerful, transformative effort of analytical wisdom is required.",
+                        children: [
+                            { title: "Analysis as the Heart of Vipaśyanā", image: svgs.insightNature, content: "True insight meditation (vipaśyanā) is, by its very nature, analytical. The practitioner must repeatedly use reasoning to investigate the object (e.g., the self) and refresh their understanding of its emptiness. The term 'non-conceptual' (avikalpa) used in scriptures to describe advanced realization does not mean abandoning analysis. Rather, it refers to the state of direct perception that arises as a result of sustained and successful analysis. Conceptual, analytical meditation is the cause; non-conceptual direct perception is the effect." }
+                        ]
+                    },
+                    {
+                        title: "Section 12: The Union of Śamatha and Vipaśyanā",
+                        image: svgs.union,
+                        content: "This section provides a practical guide to the methodology for balancing stabilizing and analytical meditation and describes the definitive signs of their successful unification. This is the goal of the <span class='modal-trigger' data-modal-id='threeTrainings'>Three Higher Trainings</span>.",
+                        children: [
+                            { title: "The Measure of Achievement", image: svgs.union, content: "The true and definitive union of śamatha and vipaśyanā is achieved when the analytical meditation itself becomes so powerful and refined that it induces a special, blissful mental and physical pliancy. This pliancy is the hallmark of having achieved fully qualified vipaśyanā. At this advanced stage, analysis no longer disturbs stability; on the contrary, it enhances it. Engaging in vipaśyanā naturally involves and strengthens śamatha, creating a self-reinforcing engine that drives the mind towards ever-deeper levels of insight." }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        const modalsData = {
+            sixPerfections: {
+                title: "The Six Perfections (Pāramitās)",
+                image: svgs.sixPerfections,
+                content: `The Six Perfections are the core practices of a Bodhisattva on the Mahayana path. They are 'perfections' because they are practiced with the wisdom realizing emptiness and motivated by bodhicitta.
+                <ul>
+                    <li><b>Generosity (Dāna):</b> The practice of giving material possessions, Dharma teachings, and protection from fear, without any expectation of reward.</li>
+                    <li><b>Ethical Conduct (Śīla):</b> The practice of refraining from harmful actions of body, speech, and mind, maintaining vows, and actively creating virtue.</li>
+                    <li><b>Patience (Kṣānti):</b> The ability to endure hardship, to remain undisturbed by harm from others, and to have the courage to face the profound truth of emptiness without fear.</li>
+                    <li><b>Joyous Effort (Vīrya):</b> The enthusiastic and persistent application of energy to virtuous practices, overcoming laziness and discouragement.</li>
+                    <li><b>Meditative Concentration (Dhyāna):</b> The ability to focus the mind single-pointedly on a virtuous object, leading to the stability of śamatha.</li>
+                    <li><b>Wisdom (Prajñā):</b> The discriminating awareness that understands the ultimate nature of reality—emptiness (śūnyatā). It is the key that makes the other five perfections truly liberating.</li>
+                </ul>`
+            },
+            fourReliances: {
+                title: "The Four Reliances",
+                image: svgs.fourReliancesModal,
+                content: `The Four Reliances are a crucial guide for students of the Dharma to ensure they correctly understand the teachings and avoid being misled. They form a hierarchy for interpreting scriptures and instructions.
+                <ul>
+                    <li><b>1. Rely on the teaching, not the person:</b> The validity of a teaching comes from its content and logic, not from the charisma or reputation of the teacher.</li>
+                    <li><b>2. Rely on the meaning, not the mere words:</b> One must look beyond the literal words to grasp the intended message. Language is a tool, and its deeper meaning is what matters.</li>
+                    <li><b>3. Rely on the definitive meaning, not the provisional meaning:</b> One must learn to distinguish teachings that state the ultimate truth (definitive) from those given for specific pedagogical purposes that require further interpretation (provisional).</li>
+                    <li><b>4. Rely on direct realization, not conceptual understanding:</b> While conceptual understanding is a necessary step, the ultimate goal is a non-conceptual, direct, and experiential realization of the truth through meditation.</li>
+                </ul>`
+            },
+            twoExtremes: {
+                title: "The Two Extremes",
+                image: svgs.twoExtremes,
+                content: `The Madhyamaka, or 'Middle Way,' path avoids two philosophical pitfalls or extremes:
+                <ul>
+                    <li><b>Eternalism (or Absolutism):</b> The view that things possess a permanent, unchanging, and inherent essence. It is the extreme of 'existence,' where one superimposes a false reality (inherent existence) onto phenomena. This leads to attachment and grasping.</li>
+                    <li><b>Nihilism (or Annihilationism):</b> The view that things do not exist at all. It arises from misunderstanding emptiness, concluding that since things lack inherent existence, they must be completely non-existent. This repudiates conventional reality, karma, and ethics.</li>
+                </ul>
+                The Middle Way understands that phenomena are empty of inherent existence, yet they still function and exist conventionally through dependent arising.`
+            },
+            dependentArising: {
+                title: "Dependent Arising (Pratītyasamutpāda)",
+                image: svgs.dependentArising,
+                content: `Dependent Arising is a cornerstone of Buddhist philosophy and the 'king of reasons' for proving emptiness. It asserts that nothing exists independently. Everything comes into being in dependence on other factors. There are three levels:
+                <ul>
+                    <li><b>Dependence on Causes and Conditions:</b> A sprout arises in dependence on a seed, water, soil, and sunlight.</li>
+                    <li><b>Dependence on Parts:</b> A 'chariot' exists in dependence on its parts—wheels, axle, frame, etc. It is not separate from its parts, nor is it merely the sum of its parts.</li>
+                    <li><b>Dependence on Imputation:</b> The most subtle level. Things exist only in dependence on being named or designated by a conceptual mind. Their existence is established by the mind that conceives of them; they have no reality from their own side.</li>
+                </ul>
+                Because things are dependently arisen, they are empty of independent, inherent existence.`
+            },
+            sevenfoldModal: {
+                title: "The Sevenfold Analysis of a Chariot",
+                image: svgs.sevenfoldModal,
+                content: `This is a classic logical meditation used to deconstruct the notion of an inherently existing self or object, using a chariot as the example. A yogi searches for the 'chariot' in relation to its parts and finds it cannot exist in any of these seven ways:
+                <ul>
+                    <li><b>1. The chariot is not the same as its parts:</b> If it were, there would be many chariots (one for each part), or the parts would be one thing.</li>
+                    <li><b>2. The chariot is not different from its parts:</b> If it were, it could be apprehended separately from its parts, which is impossible.</li>
+                    <li><b>3. The chariot is not in its parts:</b> The chariot is not contained within the wheels, axle, etc.</li>
+                    <li><b>4. The parts are not in the chariot:</b> The parts are not contained within the chariot as separate things.</li>
+                    <li><b>5. The chariot does not possess its parts:</b> This would imply a separate owner ('chariot') and owned objects ('parts'), which was refuted in point 2.</li>
+                    <li><b>6. The chariot is not the mere collection of its parts:</b> A random pile of chariot parts is not a chariot.</li>
+                    <li><b>7. The chariot is not the shape of its parts:</b> The shape depends on the parts, but if there is no 'chariot' to begin with, how can 'its' shape be the chariot?</li>
+                </ul>
+                The conclusion is that the chariot exists only as a conventional designation, imputed by mind onto the collection of its parts.`
+            },
+            fourExtremesModal: {
+                title: "The Four Extremes of Production",
+                image: svgs.fourExtremesModal,
+                content: `This reasoning refutes the inherent production of any phenomenon by showing that none of the four logical possibilities for how something could be produced are tenable.
+                <ul>
+                    <li><b>1. Production from Self:</b> This is refuted because it would mean an already existing thing is produced again, which is meaningless and would lead to endless, purposeless production.</li>
+                    <li><b>2. Production from Other:</b> This is refuted because if a cause and its effect were inherently 'other,' they would be completely unrelated, like fire and darkness. This would lead to the absurd consequence that anything could arise from anything.</li>
+                    <li><b>3. Production from Both:</b> This is refuted because it incurs the logical fallacies of both of the above positions.</li>
+                    <li><b>4. Causeless Production:</b> This is refuted because it would mean that things either arise everywhere all the time, or not at all, as there would be no specific conditions required for their arising.</li>
+                </ul>
+                Since these four cover all possibilities for inherent production, and all are refuted, it is concluded that there is no inherent production.`
+            },
+            threeTrainings: {
+                title: "The Three Higher Trainings",
+                image: svgs.threeTrainings,
+                content: `The Three Higher Trainings are the core of the Buddhist path to liberation, encompassing the development of ethical discipline, mental concentration, and wisdom.
+                <ul>
+                    <li><b>Higher Training in Ethical Conduct (Śīla):</b> This is the foundation. It involves maintaining vows and precepts to refrain from harmful actions of body, speech, and mind. This creates a stable and conducive ground for mental development.</li>
+                    <li><b>Higher Training in Meditative Stabilization (Samādhi):</b> This is the practice of developing single-pointed concentration, culminating in śamatha. A calm, stable, and focused mind is necessary to be able to effectively analyze reality.</li>
+                    <li><b>Higher Training in Wisdom (Prajñā):</b> This is the ultimate goal of the training. It involves developing the analytical insight (vipaśyanā) that directly understands the nature of reality—selflessness and emptiness. This wisdom is what ultimately cuts the root of suffering.</li>
+                </ul>`
+            }
+        };
+
+        // --- DOM ELEMENTS & STATE ---
+        const topicsTreeContainer = document.getElementById('topics-tree');
+        const contentDisplay = document.getElementById('content-display');
+        const welcomeMessage = document.getElementById('welcome-message');
+        const topicContentWrapper = document.getElementById('topic-content-wrapper');
+        const topicImage = document.getElementById('topic-image');
+        const topicTitle = document.getElementById('topic-title');
+        const topicContent = document.getElementById('topic-content');
+        const readAloudBtn = document.getElementById('read-aloud-btn');
+        const readAloudText = document.getElementById('read-aloud-text');
+
+        const qaSection = document.getElementById('qa-section');
+        const qaInput = document.getElementById('qa-input');
+        const qaSubmit = document.getElementById('qa-submit');
+        const qaSubmitText = document.getElementById('qa-submit-text');
+        const qaLoader = document.getElementById('qa-loader');
+        const qaAnswerWrapper = document.getElementById('qa-answer-wrapper');
+        const qaAnswer = document.getElementById('qa-answer');
+
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalContent = document.getElementById('modal-content');
+        const modalTitle = document.getElementById('modal-title');
+        const modalIcon = document.getElementById('modal-icon');
+        const modalBody = document.getElementById('modal-body');
+        const modalClose = document.getElementById('modal-close');
+
+        let currentTopicData = null;
+        let isSpeaking = false;
+        const synth = window.speechSynthesis;
+        let utterance = null;
+
+        // --- RENDER & INTERACTION LOGIC ---
+        function renderTree() {
+            const container = document.getElementById('topics-tree');
+            container.className = 'space-y-2';
+            infographicData.forEach(topic => {
+                container.appendChild(createTopicElement(topic));
+            });
+        }
+
+        function createTopicElement(topic) {
+            const div = document.createElement('div');
+            div.className = 'topic-item flex items-center p-3 rounded-lg cursor-pointer';
+
+            div.innerHTML = `
+                <div class="mr-4 flex-shrink-0">${topic.image.replace('w-12 h-12', 'w-10 h-10').replace('text-indigo-500', 'text-indigo-600')}</div>
+                <span class="flex-grow font-bold text-slate-700">${topic.title}</span>
+                <svg class="w-6 h-6 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            `;
+
+            div.addEventListener('click', () => {
+                displayTopicContent(topic);
+                document.querySelectorAll('.topic-item').forEach(el => el.classList.remove('selected'));
+                div.classList.add('selected');
+            });
+            return div;
+        }
+
+        function displayTopicContent(topic) {
+            currentTopicData = topic;
+            stopSpeech();
+
+            welcomeMessage.classList.add('hidden');
+            topicContentWrapper.classList.remove('hidden');
+            topicContentWrapper.classList.add('fade-in');
+            qaSection.classList.remove('hidden');
+            qaSection.classList.add('fade-in');
+            qaAnswerWrapper.classList.add('hidden');
+            qaInput.value = '';
+
+            topicImage.innerHTML = topic.image || '';
+            topicTitle.textContent = topic.title;
+
+            topicContent.innerHTML = ''; // Clear previous content
+
+            const mainContentDiv = document.createElement('div');
+            mainContentDiv.innerHTML = topic.content;
+            topicContent.appendChild(mainContentDiv);
+
+            mainContentDiv.querySelectorAll('.modal-trigger').forEach(trigger => {
+                trigger.addEventListener('click', () => {
+                    const modalId = trigger.dataset.modalId;
+                    if (modalsData[modalId]) openModal(modalsData[modalId]);
+                });
+            });
+
+            if (topic.children && topic.children.length > 0) {
+                const subTopicsContainer = document.createElement('div');
+                subTopicsContainer.className = 'mt-10 pt-6 border-t-2 border-slate-300/70';
+
+                const subTopicsTitle = document.createElement('h3');
+                subTopicsTitle.className = 'text-2xl font-bold text-slate-800 mb-6';
+                subTopicsTitle.textContent = 'Explore Sections';
+                subTopicsContainer.appendChild(subTopicsTitle);
+
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 md:grid-cols-2 gap-5';
+
+                topic.children.forEach(childTopic => {
+                    const card = document.createElement('div');
+                    card.className = 'sub-topic-card flex items-center p-4 bg-white/80 rounded-xl shadow-lg cursor-pointer';
+                    card.innerHTML = `
+                        <div class="flex-shrink-0 mr-4">${childTopic.image.replace(/w-\d+/, 'w-10').replace(/h-\d+/, 'h-10')}</div>
+                        <div class="flex-grow">
+                            <h4 class="font-bold text-slate-800 text-base">${childTopic.title}</h4>
+                        </div>
+                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5-5 5M6 12h12"></path></svg>
+                    `;
+                    card.addEventListener('click', () => {
+                        let modalHtmlContent = childTopic.content;
+                        if (childTopic.children && childTopic.children.length > 0) {
+                            modalHtmlContent += '<h4 class="mt-6 font-bold text-lg text-slate-800">Key Points:</h4>';
+                            childTopic.children.forEach(grandchild => {
+                                modalHtmlContent += `<div class="mt-2">${grandchild.content}</div>`;
+                            });
+                        }
+                        openModal({
+                            title: childTopic.title,
+                            image: childTopic.image.replace(/w-\d+/, 'w-12').replace(/h-\d+/, 'h-12'),
+                            content: modalHtmlContent
+                        });
+                    });
+                    grid.appendChild(card);
+                });
+                subTopicsContainer.appendChild(grid);
+                topicContent.appendChild(subTopicsContainer);
+            }
+        }
+
+        function openModal(modalData) {
+            modalTitle.textContent = modalData.title;
+            modalIcon.innerHTML = modalData.image || '';
+            modalBody.innerHTML = modalData.content;
+            modalOverlay.classList.remove('hidden');
+            modalOverlay.classList.add('flex');
+            setTimeout(() => {
+                modalOverlay.style.opacity = '1';
+                modalContent.style.transform = 'scale(1)';
+            }, 10);
+        }
+
+        function closeModal() {
+            modalOverlay.style.opacity = '0';
+            modalContent.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                modalOverlay.classList.add('hidden');
+                modalOverlay.classList.remove('flex');
+            }, 300);
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+
+        // --- TEXT-TO-VOICE ---
+        function speak() {
+            if (synth.speaking) return;
+            if (currentTopicData) {
+                const textToSpeak = `${topicTitle.textContent}. ${topicContent.innerText}`;
+                utterance = new SpeechSynthesisUtterance(textToSpeak);
+                utterance.onend = () => { isSpeaking = false; readAloudText.textContent = 'Read Aloud'; };
+                utterance.onerror = () => { isSpeaking = false; readAloudText.textContent = 'Read Aloud'; };
+                synth.speak(utterance);
+                isSpeaking = true;
+                readAloudText.textContent = 'Stop Reading';
+            }
+        }
+
+        function stopSpeech() {
+            if (synth.speaking) synth.cancel();
+            isSpeaking = false;
+            readAloudText.textContent = 'Read Aloud';
+        }
+
+        readAloudBtn.addEventListener('click', () => { isSpeaking ? stopSpeech() : speak(); });
+
+        // --- Q&A FUNCTIONALITY (GEMINI API) ---
+        async function getAIAnswer(question, context) {
+            qaSubmitText.classList.add('hidden');
+            qaLoader.classList.remove('hidden');
+            qaSubmit.disabled = true;
+            qaAnswerWrapper.classList.add('hidden');
+
+            const prompt = `Based on the following text about Buddhist philosophy from Tsongkhapa's Lamrim Chenmo, please answer the user's question. Be concise and directly address the question using only the information provided in the text.\n\nText:\n"${context.title}. ${context.content.replace(/<[^>]*>/g, ' ')}"\n\nQuestion:\n"${question}"\n\nAnswer:`;
+
+            const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+
+            let answerText = "Sorry, I couldn't find an answer in the provided text. Please try rephrasing your question or select a more relevant topic.";
+
+            try {
+                let response;
+                let attempts = 0;
+                let delay = 1000;
+                while (attempts < 5) {
+                    response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (response.ok) break;
+                    if (response.status === 429 || response.status >= 500) {
+                        attempts++;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    } else { throw new Error(`API request failed with status ${response.status}`); }
+                }
+                if (!response.ok) throw new Error(`API request failed after multiple retries with status ${response.status}`);
+                const result = await response.json();
+                if (result.candidates?.[0]?.content?.parts?.[0]?.text) {
+                    answerText = result.candidates[0].content.parts[0].text;
+                }
+            } catch (error) {
+                console.error('Error fetching AI answer:', error);
+                answerText = "There was an error connecting to the AI assistant. Please check your connection and try again.";
+            } finally {
+                qaAnswer.textContent = answerText;
+                qaAnswerWrapper.classList.remove('hidden');
+                qaAnswerWrapper.classList.add('fade-in');
+                qaSubmitText.classList.remove('hidden');
+                qaLoader.classList.add('hidden');
+                qaSubmit.disabled = false;
+            }
+        }
+
+        qaSubmit.addEventListener('click', () => {
+            const question = qaInput.value.trim();
+            if (question && currentTopicData) getAIAnswer(question, currentTopicData);
+            else if (!question) { qaAnswer.textContent = "Please enter a question."; qaAnswerWrapper.classList.remove('hidden'); }
+        });
+
+        qaInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') qaSubmit.click(); });
+
+        // --- INITIALIZE ---
+        renderTree();
+    </script>
+
+</body>
+</html>
